@@ -1,0 +1,26 @@
+[Unit]
+Description=webproxy tunnel server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/webproxy run --config /etc/webproxy/server.toml
+Restart=always
+# Graceful stop: shutdown_timeout_secs (30) plus a margin before systemd kills the process.
+TimeoutStopSec=45
+RestartSec=2
+User=webproxy
+Group=webproxy
+# One socket per tunnel connection plus one per upstream connection.
+LimitNOFILE=1048576
+Environment=WEBPROXY_LOG=info
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/etc/webproxy
+# Needed only to bind ports below 1024:
+# AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
